@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block content %}
+<div class="posts-container">
+    {% for post in posts %}
+        <article class="post">
+            <h2 class="post-title"><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+            <div class="post-meta">
+                <span class="post-date">{{ post.created_at|date:"F j, Y" }}</span>
+                <span class="post-author">by {{ post.author }}</span>
+            </div>
+            <div class="post-content">
+                {{ post.content|truncatewords:50 }}
+            </div>
+            <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More</a>
+        </article>
+    {% empty %}
+        <p class="no-posts">No posts found.</p>
+    {% endfor %}
+</div>
+{% endblock %} 
