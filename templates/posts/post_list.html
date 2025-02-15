@@ -20,14 +20,61 @@
                 {% if post.author %}
                     <span class="post-author">by {{ post.author.username }}</span>
                 {% endif %}
+                <span class="post-likes">❤️ {{ post.likes }} likes</span>
             </div>
             <div class="post-content">
                 {{ post.content|truncatewords:50 }}
             </div>
-            <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More</a>
+            <div class="post-actions">
+                <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More</a>
+                <button class="btn btn-like" data-post-id="{{ post.pk }}">Like</button>
+            </div>
         </article>
     {% empty %}
         <p class="no-posts">No posts found.</p>
     {% endfor %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButtons = document.querySelectorAll('.btn-like');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            fetch(`/post/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the likes count in the UI
+                    const likesSpan = this.closest('.post').querySelector('.post-likes');
+                    likesSpan.textContent = `❤️ ${data.likes} likes`;
+                }
+            });
+        });
+    });
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
 {% endblock %} 

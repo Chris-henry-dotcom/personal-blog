@@ -50,3 +50,10 @@ def delete_post(request, pk):
         post.delete()
         return redirect('post_list')
     return render(request, 'posts/post_confirm_delete.html', {'post': post})
+
+@login_required
+def like_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.likes += 1
+    post.save()
+    return redirect('post_list')
