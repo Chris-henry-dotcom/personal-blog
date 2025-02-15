@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <div class="profile-section">
+        <h2>Account Details</h2>
+        <div class="user-info">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</p>
+            {% if user.profile.bio %}
+                <p><strong>Bio:</strong> {{ user.profile.bio }}</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+    </div>
+
+    <div class="user-posts">
+        <h2>My Posts</h2>
+        {% if user_posts %}
+            <div class="posts-grid">
+                {% for post in user_posts %}
+                    <article class="post">
+                        <h3><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
+                        <p class="post-date">{{ post.pub_date|date:"F j, Y" }}</p>
+                        <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
+                        <div class="post-actions">
+                            <a href="{% url 'edit_post' pk=post.pk %}" class="btn">Edit</a>
+                            <a href="{% url 'delete_post' pk=post.pk %}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You haven't created any posts yet.</p>
+            <a href="{% url 'create_post' %}" class="btn">Create Your First Post</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
